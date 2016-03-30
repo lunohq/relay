@@ -1,0 +1,5 @@
+package: github.com/lunohq/relay
+import:
+- package: github.com/codegangsta/cli
+- package: gopkg.in/redis.v3
+- package: github.com/nlopes/slack
