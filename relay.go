@@ -3,7 +3,7 @@ package relay
 import (
 	log "github.com/Sirupsen/logrus"
 
-	//"github.com/lunohq/slack"
+	"github.com/lunohq/relay/slack"
 )
 
 type Config struct {
@@ -26,24 +26,24 @@ func New(c *Config) *Relay {
 // Start opens a RTM connection for the configured team
 func (r *Relay) Start() {
 	log.WithFields(log.Fields{
-		"team_id": c.TeamId,
+		"team_id": r.config.TeamId,
 	}).Info("starting relay")
 
-	//client := slack.New(r.config.TeamId, r.config.Token)
-	//r.clients = append(r.clients, client)
+	client := slack.New(r.config.TeamId, r.config.Token)
+	r.clients = append(r.clients, client)
 
-	//for _, c := range r.clients {
-		//c.Connect()
-		//go c.Start()
-	//}
+	for _, c := range r.clients {
+		c.Connect()
+		go c.Start()
+	}
 }
 
 // Shutdown closes a RTM connection for the configured team
 func (r *Relay) Shutdown() error {
 	log.Info("shutting down relay")
-	//for _, c := range r.clients {
-		//c.Disconnect()
-	//}
+	for _, c := range r.clients {
+		c.Disconnect()
+	}
 
 	return nil
 }
