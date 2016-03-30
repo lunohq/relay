@@ -15,7 +15,7 @@ type Event struct {
 	// messages we may want to send to the broker backend in the future.
 	Source string `json:"source"`
 	// Payload is the payload of the event.
-	Payload []byte `json:"payload"`
+	Payload interface{} `json:"payload"`
 	// Context is any relevant context for the event.
 	Context Context `json:"context"`
 }

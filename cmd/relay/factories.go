@@ -21,6 +21,8 @@ func newRelay(c *cli.Context) *relay.Relay {
 }
 
 func newBroker(c *cli.Context) broker.Broker {
-	b := sns.New()
+	b := sns.New(sns.Options{
+		TopicArn: c.Args()[2],
+	})
 	return b
 }

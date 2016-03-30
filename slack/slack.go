@@ -1,8 +1,6 @@
 package slack
 
 import (
-	"encoding/json"
-
 	api "github.com/nlopes/slack"
 	log "github.com/Sirupsen/logrus"
 
@@ -86,24 +84,22 @@ func (c *Client) Disconnect() error {
 
 // Foward fowards an RTMEvent to the broker
 func (c *Client) Forward(msg api.RTMEvent) {
-	payload, err := json.Marshal(msg.Data)
+	event := broker.Event{
+		Type: msg.Type,
+		// TODO this should be a constant
+		Source: "slack",
+		Payload: msg.Data,
+		Context: broker.Context{
+			BotID: c.rtm.GetInfo().User.ID,
+			TeamID: c.TeamID,
+		},
+	}
+	err := c.Broker.Handle(event)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"team_id": c.TeamID,
 			"err": err,
-			"data": msg.Data,
-		}).Error("Unable to marshal data")
-	} else {
-		event := broker.Event{
-			Type: msg.Type,
-			// TODO this should be a constant
-			Source: "slack",
-			Payload: payload,
-			Context: broker.Context{
-				BotID: c.rtm.GetInfo().User.ID,
-				TeamID: c.TeamID,
-			},
-		}
-		c.Broker.Handle(event)
+			"event": event,
+		}).Error("Broker failed to handle event")
 	}
 }
