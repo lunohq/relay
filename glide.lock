@@ -1,10 +1,8 @@
-hash: 746c1d5bbef30acd77ae51a1d3795f1c1a1418dbfd5bd2775a10a9760f38f323
-updated: 2016-03-29T17:03:12.379014666-07:00
+hash: 144a3e4fee7b08eac3b15946324db896a1e0269173b98721b85fc7538b470ac1
+updated: 2016-03-29T17:43:58.268318115-07:00
 imports:
 - name: github.com/codegangsta/cli
   version: bc465becccd1d527002fda095fc3c19d9c115029
-- name: github.com/gorilla/websocket
-  version: e2e3d8414d0fbae04004f151979f4e27c6747fe7
 - name: github.com/nlopes/slack
   version: 5e8064e706a2cb3d2581c1298d9428db2c0984fa
 - name: github.com/Sirupsen/logrus
