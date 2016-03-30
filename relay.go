@@ -3,11 +3,17 @@ package relay
 import (
 	log "github.com/Sirupsen/logrus"
 
+	"github.com/lunohq/relay/broker"
 	"github.com/lunohq/relay/slack"
 )
 
 type Config struct {
-	TeamId string
+	// Broker to use to handle events
+	Broker broker.Broker
+
+	// TeamID is the id of the team to init the client for.
+	TeamID string
+	// Token is the token to init the client with.
 	Token string
 }
 
@@ -26,10 +32,14 @@ func New(c *Config) *Relay {
 // Start opens a RTM connection for the configured team
 func (r *Relay) Start() {
 	log.WithFields(log.Fields{
-		"team_id": r.config.TeamId,
+		"team_id": r.config.TeamID,
 	}).Info("starting relay")
 
-	client := slack.New(r.config.TeamId, r.config.Token)
+	client := slack.New(slack.Options{
+		Broker: r.config.Broker,
+		TeamID: r.config.TeamID,
+		Token: r.config.Token,
+	})
 	r.clients = append(r.clients, client)
 
 	for _, c := range r.clients {

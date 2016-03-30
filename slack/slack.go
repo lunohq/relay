@@ -1,26 +1,51 @@
 package slack
 
 import (
+	"encoding/json"
+
 	api "github.com/nlopes/slack"
 	log "github.com/Sirupsen/logrus"
+
+	"github.com/lunohq/relay/broker"
 )
 
+type Options struct {
+	// Broker to use to handle events
+	Broker broker.Broker
+
+	// TeamID is the id of the team to init the client for.
+	TeamID string
+	// Token is the token to init the client with.
+	Token string
+}
+
 type Client struct {
-	TeamId string
+	// Broker that will handle events
+	Broker broker.Broker
+
+	// TeamID is the id of the team for this client.
+	TeamID string
+	// Token is the token for this client.
 	Token string
 
+	// rtm is a pointer to the RTM connection
 	rtm *api.RTM
+
 }
 
 // New returns a new Client instance
-func New(teamId, token string) *Client {
-	return &Client{TeamId: teamId, Token: token}
+func New(options Options) *Client {
+	return &Client{
+		Broker: options.Broker,
+		TeamID: options.TeamID,
+		Token: options.Token,
+	}
 }
 
 // Connect connects the client to the RTM api
 func (c *Client) Connect() {
 	log.WithFields(log.Fields{
-		"team_id": c.TeamId,
+		"team_id": c.TeamID,
 	}).Info("connecting to slack rtm")
 
 	a := api.New(c.Token)
@@ -33,18 +58,16 @@ func (c *Client) Connect() {
 // Start listens to events from the RTM api
 func (c *Client) Start() error {
 	log.WithFields(log.Fields{
-		"team_id": c.TeamId,
+		"team_id": c.TeamID,
 	}).Info("starting to listen for events")
 
 	for {
 		select {
 		case msg := <-c.rtm.IncomingEvents:
 			switch msg.Data.(type) {
-			default:
-				//log.WithFields(log.Fields{
-					//"team_id": c.TeamId,
-					//"data": msg.Data,
-				//}).Info("Received event")
+			// TODO the types of events we forward should come from some config file
+			case *api.MessageEvent:
+				c.Forward(msg)
 			}
 		}
 	}
@@ -55,8 +78,32 @@ func (c *Client) Start() error {
 // Disconnect disconnects the client from the RTM api
 func (c *Client) Disconnect() error {
 	log.WithFields(log.Fields{
-		"team_id": c.TeamId,
+		"team_id": c.TeamID,
 	}).Info("disconnecting from rtm")
 
 	return c.rtm.Disconnect()
+}
+
+// Foward fowards an RTMEvent to the broker
+func (c *Client) Forward(msg api.RTMEvent) {
+	payload, err := json.Marshal(msg.Data)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"team_id": c.TeamID,
+			"err": err,
+			"data": msg.Data,
+		}).Error("Unable to marshal data")
+	} else {
+		event := broker.Event{
+			Type: msg.Type,
+			// TODO this should be a constant
+			Source: "slack",
+			Payload: payload,
+			Context: broker.Context{
+				BotID: c.rtm.GetInfo().User.ID,
+				TeamID: c.TeamID,
+			},
+		}
+		c.Broker.Handle(event)
+	}
 }
