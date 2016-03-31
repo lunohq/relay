@@ -62,10 +62,15 @@ func (c *Client) Start() error {
 	for {
 		select {
 		case msg := <-c.rtm.IncomingEvents:
-			switch msg.Data.(type) {
+			switch ev := msg.Data.(type) {
 			// TODO the types of events we forward should come from some config file
 			case *api.MessageEvent:
-				c.Forward(msg)
+				// TODO come up with a more composable filter mechanism
+
+				// Don't forward messages sent by the connected user
+				if ev.Msg.User != c.rtm.GetInfo().User.ID {
+					c.Forward(msg)
+				}
 			}
 		}
 	}
