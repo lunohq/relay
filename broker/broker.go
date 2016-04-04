@@ -1,6 +1,10 @@
 // Package broker provides methods for sending events to various broker backends
 package broker
 
+import (
+	"github.com/nlopes/slack"
+)
+
 type Context struct {
 	// BotID is the user id of the bot
 	BotID string `json:"bot_id"`
@@ -18,6 +22,8 @@ type Event struct {
 	Payload interface{} `json:"payload"`
 	// Context is any relevant context for the event.
 	Context Context `json:"context"`
+	// RTMEvent is the raw real time message from slack.
+	RTMEvent *slack.RTMEvent
 }
 
 // Broker represents something that can handle a relay event

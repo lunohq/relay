@@ -62,16 +62,7 @@ func (c *Client) Start() error {
 	for {
 		select {
 		case msg := <-c.rtm.IncomingEvents:
-			switch ev := msg.Data.(type) {
-			// TODO the types of events we forward should come from some config file
-			case *api.MessageEvent:
-				// TODO come up with a more composable filter mechanism
-
-				// Don't forward messages sent by the connected user
-				if ev.Msg.User != c.rtm.GetInfo().User.ID {
-					c.Forward(msg)
-				}
-			}
+			c.Forward(msg)
 		}
 	}
 
@@ -88,23 +79,27 @@ func (c *Client) Disconnect() error {
 }
 
 // Foward fowards an RTMEvent to the broker
-func (c *Client) Forward(msg api.RTMEvent) {
-	event := broker.Event{
-		Type: msg.Type,
-		// TODO this should be a constant
-		Source: "slack",
-		Payload: msg.Data,
-		Context: broker.Context{
-			BotID: c.rtm.GetInfo().User.ID,
-			TeamID: c.TeamID,
-		},
-	}
-	err := c.Broker.Handle(event)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"team_id": c.TeamID,
-			"err": err,
-			"event": event,
-		}).Error("Broker failed to handle event")
+func (c *Client) Forward(e api.RTMEvent) {
+	info := c.rtm.GetInfo()
+	if info != nil {
+		event := broker.Event{
+			Type: e.Type,
+			// TODO this should be a constant
+			Source: "slack",
+			Payload: e.Data,
+			Context: broker.Context{
+				BotID: info.User.ID,
+				TeamID: c.TeamID,
+			},
+			RTMEvent: &e,
+		}
+		err := c.Broker.Handle(event)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"team_id": c.TeamID,
+				"err": err,
+				"event": event,
+			}).Error("Broker failed to handle event")
+		}
 	}
 }

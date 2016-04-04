@@ -1,4 +1,4 @@
-.PHONY: build
+.PHONY: build, cmd
 
 cmd:
 	go build -o build/relay ./cmd/relay
