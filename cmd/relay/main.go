@@ -18,7 +18,7 @@ func main() {
 		cli.StringFlag{
 			Name: "sns.topic",
 			Value: "",
-			Usage: "SNS Topic ARN to configure the SNS broker",
+			Usage: "SNS Topic ARN to configure the SNS handler",
 			EnvVar: "SNS_TOPIC",
 		},
 		cli.StringFlag{

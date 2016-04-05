@@ -4,12 +4,12 @@ import (
 	api "github.com/nlopes/slack"
 	log "github.com/Sirupsen/logrus"
 
-	"github.com/lunohq/relay/broker"
+	"github.com/lunohq/relay/handler"
 )
 
 type Options struct {
-	// Broker to use to handle events
-	Broker broker.Broker
+	// Handler to use to handle events
+	Handler handler.Handler
 
 	// TeamID is the id of the team to init the client for.
 	TeamID string
@@ -18,8 +18,8 @@ type Options struct {
 }
 
 type Client struct {
-	// Broker that will handle events
-	Broker broker.Broker
+	// Handler that will handle events
+	Handler handler.Handler
 
 	// TeamID is the id of the team for this client.
 	TeamID string
@@ -34,7 +34,7 @@ type Client struct {
 // New returns a new Client instance
 func New(options Options) *Client {
 	return &Client{
-		Broker: options.Broker,
+		Handler: options.Handler,
 		TeamID: options.TeamID,
 		Token: options.Token,
 	}
@@ -78,28 +78,28 @@ func (c *Client) Disconnect() error {
 	return c.rtm.Disconnect()
 }
 
-// Foward fowards an RTMEvent to the broker
+// Foward fowards an RTMEvent to the handler
 func (c *Client) Forward(e api.RTMEvent) {
 	info := c.rtm.GetInfo()
 	if info != nil {
-		event := broker.Event{
+		event := handler.Event{
 			Type: e.Type,
 			// TODO this should be a constant
 			Source: "slack",
 			Payload: e.Data,
-			Context: broker.Context{
+			Context: handler.Context{
 				BotID: info.User.ID,
 				TeamID: c.TeamID,
 			},
 			RTMEvent: &e,
 		}
-		err := c.Broker.Handle(event)
+		err := c.Handler.Process(event)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"team_id": c.TeamID,
 				"err": err,
 				"event": event,
-			}).Error("Broker failed to handle event")
+			}).Error("Handler failed to process event")
 		}
 	}
 }

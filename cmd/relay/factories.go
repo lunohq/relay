@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/lunohq/relay"
-	"github.com/lunohq/relay/broker"
-	"github.com/lunohq/relay/broker/sns"
+	"github.com/lunohq/relay/handler"
+	"github.com/lunohq/relay/handler/sns"
 	"github.com/codegangsta/cli"
 )
 
@@ -21,7 +21,7 @@ func newConfig(c *cli.Context) *relay.Config {
 	}
 
 	return &relay.Config{
-		Broker: newBroker(c),
+		Handler: newHandler(c),
 		TeamID: c.String("slack.team"),
 		Token: c.String("slack.token"),
 	}
@@ -32,12 +32,12 @@ func newRelay(c *cli.Context) *relay.Relay {
 	return r
 }
 
-func newBroker(c *cli.Context) broker.Broker {
+func newHandler(c *cli.Context) handler.Handler {
 	if t := c.String("sns.topic"); t != "" {
 		return sns.New(sns.Options{
 			TopicArn: t,
 		})
 	}
-	must(errors.New("Must provide at least one broker config value"))
+	must(errors.New("Must provide at least one handler config value"))
 	return nil
 }

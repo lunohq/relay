@@ -3,13 +3,13 @@ package relay
 import (
 	log "github.com/Sirupsen/logrus"
 
-	"github.com/lunohq/relay/broker"
+	"github.com/lunohq/relay/handler"
 	"github.com/lunohq/relay/slack"
 )
 
 type Config struct {
-	// Broker to use to handle events
-	Broker broker.Broker
+	// Handler to use to handle events
+	Handler handler.Handler
 
 	// TeamID is the id of the team to init the client for.
 	TeamID string
@@ -36,7 +36,7 @@ func (r *Relay) Start() {
 	}).Info("starting relay")
 
 	client := slack.New(slack.Options{
-		Broker: r.config.Broker,
+		Handler: r.config.Handler,
 		TeamID: r.config.TeamID,
 		Token: r.config.Token,
 	})
