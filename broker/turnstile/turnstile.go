@@ -60,7 +60,7 @@ type OnlyMentionOrDM struct {}
 func (t *OnlyMentionOrDM) Test(e broker.Event) (bool, string) {
 	ev, ok := e.RTMEvent.Data.(*slack.MessageEvent)
 	if ok {
-		if ev.Channel == e.Context.BotID {
+		if strings.HasPrefix(ev.Channel, "D") {
 			return true, ""
 		} else if strings.Contains(ev.Text, e.Context.BotID) {
 			return true, ""
