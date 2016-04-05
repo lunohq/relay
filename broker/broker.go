@@ -23,7 +23,7 @@ type Event struct {
 	// Context is any relevant context for the event.
 	Context Context `json:"context"`
 	// RTMEvent is the raw real time message from slack.
-	RTMEvent *slack.RTMEvent
+	RTMEvent *slack.RTMEvent `json:"-"`
 }
 
 // Broker represents something that can handle a relay event
