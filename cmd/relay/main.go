@@ -21,6 +21,18 @@ func main() {
 			Usage: "SNS Topic ARN to configure the SNS broker",
 			EnvVar: "SNS_TOPIC",
 		},
+		cli.StringFlag{
+			Name: "slack.token",
+			Value: "",
+			Usage: "[Developing] slack token we use to connect to RTM. This is a temporary parameter",
+			EnvVar: "SLACK_TOKEN",
+		},
+		cli.StringFlag{
+			Name: "slack.team",
+			Value: "",
+			Usage: "[Developing] slack team we use to connect to RTM. This is a temporary parameter",
+			EnvVar: "SLACK_TEAM",
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {

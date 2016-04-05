@@ -10,10 +10,20 @@ import (
 )
 
 func newConfig(c *cli.Context) *relay.Config {
+	if c.String("slack.token") == "" {
+		must(errors.New("slack.token must be provided"))
+		return nil
+	}
+
+	if c.String("slack.team") == "" {
+		must(errors.New("slack.team must be provided"))
+		return nil
+	}
+
 	return &relay.Config{
 		Broker: newBroker(c),
-		TeamID: c.Args()[0],
-		Token: c.Args()[1],
+		TeamID: c.String("slack.team"),
+		Token: c.String("slack.token"),
 	}
 }
 
