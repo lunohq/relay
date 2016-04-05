@@ -10,10 +10,11 @@ import (
 	"github.com/aws/aws-sdk-go/service/sns"
 
 	"github.com/lunohq/relay/broker"
+	"github.com/lunohq/relay/broker/turnstile"
 	log "github.com/Sirupsen/logrus"
 )
 
-type Turnstiles []broker.Turnstile
+type Turnstiles []turnstile.Turnstile
 
 // Options are the options the Broker accepts.
 type Options struct {
@@ -34,15 +35,14 @@ type Broker struct {
 
 // New returns a new Broker backed by SNS
 func New(options Options) *Broker {
-	messageTurnstiles := []broker.Turnstile{
-		&broker.MessageEvents{},
-		&broker.IgnoreOwnMessages{},
-		&broker.OnlyMentionOrDM{},
+	messageTurnstiles := []turnstile.Turnstile{
+		&turnstile.MessageEvents{},
+		&turnstile.IgnoreOwnMessages{},
+		&turnstile.OnlyMentionOrDM{},
 	}
 
-	turnstiles := []broker.Turnstile{
-		broker.NewTurnstileGroup(messageTurnstiles),
-		&broker.ConnectedEvent{},
+	turnstiles := []turnstile.Turnstile{
+		turnstile.NewTurnstileGroup(messageTurnstiles),
 	}
 	return &Broker{
 		TopicArn: options.TopicArn,
