@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+
 	"github.com/lunohq/relay"
 	"github.com/lunohq/relay/broker"
 	"github.com/lunohq/relay/broker/sns"
@@ -21,8 +23,11 @@ func newRelay(c *cli.Context) *relay.Relay {
 }
 
 func newBroker(c *cli.Context) broker.Broker {
-	b := sns.New(sns.Options{
-		TopicArn: c.Args()[2],
-	})
-	return b
+	if t := c.String("sns.topic"); t != "" {
+		return sns.New(sns.Options{
+			TopicArn: t,
+		})
+	}
+	must(errors.New("Must provide at least one broker config value"))
+	return nil
 }
