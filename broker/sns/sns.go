@@ -43,6 +43,7 @@ func New(options Options) *Broker {
 
 	turnstiles := []turnstile.Turnstile{
 		turnstile.NewTurnstileGroup(messageTurnstiles),
+		&turnstile.ConnectedEvent{},
 	}
 	return &Broker{
 		TopicArn: options.TopicArn,
