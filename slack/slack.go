@@ -8,8 +8,8 @@ import (
 )
 
 type Options struct {
-	// Handler to use to handle events
-	Handler handler.Handler
+	// Handlers to use to handle events
+	Handlers []handler.Handler
 
 	// TeamID is the id of the team to init the client for.
 	TeamID string
@@ -18,8 +18,8 @@ type Options struct {
 }
 
 type Client struct {
-	// Handler that will handle events
-	Handler handler.Handler
+	// Handlers that will handle events
+	Handlers []handler.Handler
 
 	// TeamID is the id of the team for this client.
 	TeamID string
@@ -34,7 +34,7 @@ type Client struct {
 // New returns a new Client instance
 func New(options Options) *Client {
 	return &Client{
-		Handler: options.Handler,
+		Handlers: options.Handlers,
 		TeamID: options.TeamID,
 		Token: options.Token,
 	}
@@ -78,7 +78,7 @@ func (c *Client) Disconnect() error {
 	return c.rtm.Disconnect()
 }
 
-// Foward fowards an RTMEvent to the handler
+// Foward fowards an RTMEvent to any handlers
 func (c *Client) Forward(e api.RTMEvent) {
 	info := c.rtm.GetInfo()
 	if info != nil {
@@ -93,13 +93,15 @@ func (c *Client) Forward(e api.RTMEvent) {
 			},
 			RTMEvent: &e,
 		}
-		err := c.Handler.Process(event)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"team_id": c.TeamID,
-				"err": err,
-				"event": event,
-			}).Error("Handler failed to process event")
+		for _, h := range c.Handlers {
+			err := h.Process(event)
+			if err != nil {
+				log.WithFields(log.Fields{
+					"team_id": c.TeamID,
+					"err": err,
+					"event": event,
+				}).Error("Handler failed to process event")
+			}
 		}
 	}
 }

@@ -8,8 +8,8 @@ import (
 )
 
 type Config struct {
-	// Handler to use to handle events
-	Handler handler.Handler
+	// Handlers to use to handle events
+	Handlers []handler.Handler
 
 	// TeamID is the id of the team to init the client for.
 	TeamID string
@@ -36,7 +36,7 @@ func (r *Relay) Start() {
 	}).Info("starting relay")
 
 	client := slack.New(slack.Options{
-		Handler: r.config.Handler,
+		Handlers: r.config.Handlers,
 		TeamID: r.config.TeamID,
 		Token: r.config.Token,
 	})

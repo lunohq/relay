@@ -23,7 +23,7 @@ func newConfig(c *cli.Context) *relay.Config {
 	}
 
 	return &relay.Config{
-		Handler: newHandler(c),
+		Handlers: newHandlers(c),
 		TeamID: c.String("slack.team"),
 		Token: c.String("slack.token"),
 	}
@@ -34,22 +34,27 @@ func newRelay(c *cli.Context) *relay.Relay {
 	return r
 }
 
-func newHandler(c *cli.Context) handler.Handler {
+func newHandlers(c *cli.Context) (handlers []handler.Handler) {
 	if t := c.String("sns.topic"); t != "" {
-		return sns.New(sns.Options{
+		handler := sns.New(sns.Options{
 			TopicArn: t,
 		})
-	} else if d := c.String("firehose.stream"); d != "" {
-		return firehose.New(firehose.Options{
-			DeliveryStreamName: d,
-		})
+		handlers = append(handlers, handler)
 	} else if f := c.String("lambda.function"); f != "" {
-		return lambda.New(lambda.Options{
+		handler := lambda.New(lambda.Options{
 			FunctionName: f,
 			Qualifier: c.String("lambda.qualifier"),
 		})
+		handlers = append(handlers, handler)
+	} else if d := c.String("firehose.stream"); d != "" {
+		handler := firehose.New(firehose.Options{
+			DeliveryStreamName: d,
+		})
+		handlers = append(handlers, handler)
 	}
 
-	must(errors.New("Must provide at least one handler config value"))
-	return nil
+	if len(handlers) == 0 {
+		must(errors.New("Must provide at least one handler config value"))
+	}
+	return handlers
 }
