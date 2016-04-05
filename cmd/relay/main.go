@@ -28,6 +28,18 @@ func main() {
 			EnvVar: "FIREHOSE_STREAM",
 		},
 		cli.StringFlag{
+			Name: "lambda.function",
+			Value: "",
+			Usage: "Lambda function to configure the Lambda handler",
+			EnvVar: "LAMBDA_FUNCTION",
+		},
+		cli.StringFlag{
+			Name: "lambda.qualifier",
+			Value: "",
+			Usage: "Qualifier to use when invoking lambda function",
+			EnvVar: "LAMBDA_QUALIFIER",
+		},
+		cli.StringFlag{
 			Name: "slack.token",
 			Value: "",
 			Usage: "[Developing] slack token we use to connect to RTM. This is a temporary parameter",

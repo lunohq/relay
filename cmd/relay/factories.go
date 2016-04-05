@@ -7,6 +7,7 @@ import (
 	"github.com/lunohq/relay/handler"
 	"github.com/lunohq/relay/handler/sns"
 	"github.com/lunohq/relay/handler/firehose"
+	"github.com/lunohq/relay/handler/lambda"
 	"github.com/codegangsta/cli"
 )
 
@@ -41,6 +42,11 @@ func newHandler(c *cli.Context) handler.Handler {
 	} else if d := c.String("firehose.stream"); d != "" {
 		return firehose.New(firehose.Options{
 			DeliveryStreamName: d,
+		})
+	} else if f := c.String("lambda.function"); f != "" {
+		return lambda.New(lambda.Options{
+			FunctionName: f,
+			Qualifier: c.String("lambda.qualifier"),
 		})
 	}
 
