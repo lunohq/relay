@@ -6,6 +6,7 @@ import (
 	"github.com/lunohq/relay"
 	"github.com/lunohq/relay/handler"
 	"github.com/lunohq/relay/handler/sns"
+	"github.com/lunohq/relay/handler/firehose"
 	"github.com/codegangsta/cli"
 )
 
@@ -37,7 +38,12 @@ func newHandler(c *cli.Context) handler.Handler {
 		return sns.New(sns.Options{
 			TopicArn: t,
 		})
+	} else if d := c.String("firehose.stream"); d != "" {
+		return firehose.New(firehose.Options{
+			DeliveryStreamName: d,
+		})
 	}
+
 	must(errors.New("Must provide at least one handler config value"))
 	return nil
 }

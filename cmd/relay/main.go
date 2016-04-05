@@ -22,6 +22,12 @@ func main() {
 			EnvVar: "SNS_TOPIC",
 		},
 		cli.StringFlag{
+			Name: "firehose.stream",
+			Value: "",
+			Usage: "Kinesis Firehose Delivery Stream Name to configure the Firehose handler",
+			EnvVar: "FIREHOSE_STREAM",
+		},
+		cli.StringFlag{
 			Name: "slack.token",
 			Value: "",
 			Usage: "[Developing] slack token we use to connect to RTM. This is a temporary parameter",
