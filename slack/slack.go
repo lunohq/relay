@@ -33,6 +33,10 @@ type Client struct {
 
 // New returns a new Client instance
 func New(options Options) *Client {
+	log.WithFields(log.Fields{
+		"handlers": len(options.Handlers),
+		"team_id": options.TeamID,
+	}).Info("creating slack client")
 	return &Client{
 		Handlers: options.Handlers,
 		TeamID: options.TeamID,
@@ -94,6 +98,9 @@ func (c *Client) Forward(e api.RTMEvent) {
 			RTMEvent: &e,
 		}
 		for _, h := range c.Handlers {
+			log.WithFields(log.Fields{
+				"handler": h.String(),
+			}).Info("processing event")
 			err := h.Process(event)
 			if err != nil {
 				log.WithFields(log.Fields{

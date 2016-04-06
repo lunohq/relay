@@ -31,6 +31,9 @@ type Handler struct {
 // New returns a new Lambda Handler
 func New(options Options) *Handler {
 	return &Handler{
+		Base: handler.Base{
+			Name: "lambda",
+		},
 		FunctionName: options.FunctionName,
 		Qualifier: options.Qualifier,
 	}

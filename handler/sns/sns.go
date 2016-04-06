@@ -41,7 +41,10 @@ func New(options Options) *Handler {
 		&handler.AllowConnectedEvent{},
 	}
 	return &Handler{
-		Base: handler.Base{Turnstiles: turnstiles},
+		Base: handler.Base{
+			Name: "sns",
+			Turnstiles: turnstiles,
+		},
 		TopicArn: options.TopicArn,
 	}
 }

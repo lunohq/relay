@@ -42,6 +42,7 @@ func (e *Event) Serialize() ([]byte, error) {
 
 // Handler represents something that can handle a relay event
 type Handler interface {
+
 	// Handle should handle an event from the slack client. In general, it's
 	// expected that the event will be forwarded to some other system for
 	// processing (ie. SNS).
@@ -51,13 +52,25 @@ type Handler interface {
 	// expected that the handler will determine if the event should be handled
 	// and then handle it.
 	Process(e Event) error
+
+	// Return the name of the handler
+	String() string
 }
 
 // Base is the base struct that Handlers should embed
 type Base struct {
 	Handler
+
+	// Name is the name of the handler
+	Name string
+
 	// Turnstiles is an array of Turnstile to pass an event through
 	Turnstiles []Turnstile
+}
+
+// String should return the name of the handler
+func (h *Base) String() string {
+	return h.Name
 }
 
 // ShouldHandle passes the event through any registered turnstiles to determine if

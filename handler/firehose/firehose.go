@@ -27,6 +27,9 @@ type Handler struct {
 // New returns a new Firehose Handler
 func New(options Options) *Handler {
 	return &Handler{
+		Base: handler.Base{
+			Name: "firehose",
+		},
 		DeliveryStreamName: options.DeliveryStreamName,
 	}
 }
