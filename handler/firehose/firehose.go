@@ -26,9 +26,13 @@ type Handler struct {
 
 // New returns a new Firehose Handler
 func New(options Options) *Handler {
+	turnstiles := []handler.Turnstile{
+		&handler.AllowAll{},
+	}
 	return &Handler{
 		Base: handler.Base{
 			Name: "firehose",
+			Turnstiles: turnstiles,
 		},
 		DeliveryStreamName: options.DeliveryStreamName,
 	}

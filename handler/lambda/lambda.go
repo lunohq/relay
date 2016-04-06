@@ -30,9 +30,23 @@ type Handler struct {
 
 // New returns a new Lambda Handler
 func New(options Options) *Handler {
+	messageTurnstiles := []handler.Turnstile{
+		&handler.AllowMessages{},
+		&handler.IgnoreOwnMessages{},
+		handler.NewTurnstileGroup([]handler.Turnstile{
+			&handler.AllowMention{},
+			&handler.AllowDirectMessage{},
+		}, false),
+	}
+
+	turnstiles := []handler.Turnstile{
+		handler.NewTurnstileGroup(messageTurnstiles, true),
+		&handler.AllowConnectedEvent{},
+	}
 	return &Handler{
 		Base: handler.Base{
 			Name: "lambda",
+			Turnstiles: turnstiles,
 		},
 		FunctionName: options.FunctionName,
 		Qualifier: options.Qualifier,

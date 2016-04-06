@@ -41,6 +41,13 @@ func (g *TurnstileGroup) Test(e Event) (bool, string) {
 	}
 }
 
+// AllowAll allows any event
+type AllowAll struct {}
+
+func (t *AllowAll) Test(e Event) (bool, string) {
+	return true, ""
+}
+
 // AllowMessages allows slack.MessageEvent
 type AllowMessages struct {}
 
