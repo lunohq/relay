@@ -68,6 +68,11 @@ type Base struct {
 	Turnstiles []Turnstile
 }
 
+// Handle should be overridden by subclass
+func (h *Base) Handle(e Event) error {
+	return nil
+}
+
 // String should return the name of the handler
 func (h *Base) String() string {
 	return h.Name
