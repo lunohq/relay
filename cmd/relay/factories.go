@@ -40,13 +40,17 @@ func newHandlers(c *cli.Context) (handlers []handler.Handler) {
 			TopicArn: t,
 		})
 		handlers = append(handlers, handler)
-	} else if f := c.String("lambda.function"); f != "" {
+	}
+
+	if f := c.String("lambda.function"); f != "" {
 		handler := lambda.New(lambda.Options{
 			FunctionName: f,
 			Qualifier: c.String("lambda.qualifier"),
 		})
 		handlers = append(handlers, handler)
-	} else if d := c.String("firehose.stream"); d != "" {
+	}
+
+	if d := c.String("firehose.stream"); d != "" {
 		handler := firehose.New(firehose.Options{
 			DeliveryStreamName: d,
 		})
