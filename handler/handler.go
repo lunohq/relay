@@ -48,10 +48,9 @@ type Handler interface {
 	// processing (ie. SNS).
 	Handle(e Event) error
 
-	// Process should process an event from the slack client. In general, it's
-	// expected that the handler will determine if the event should be handled
-	// and then handle it.
-	Process(e Event) error
+	// ShouldHandle should return a boolean for whether or not the handler
+	// should process the event.
+	ShouldHandle(e Event) bool
 
 	// Return the name of the handler
 	String() string
@@ -66,11 +65,6 @@ type Base struct {
 
 	// Turnstiles is an array of Turnstile to pass an event through
 	Turnstiles []Turnstile
-}
-
-// Handle should be overridden by subclass
-func (h *Base) Handle(e Event) error {
-	return nil
 }
 
 // String should return the name of the handler
@@ -93,8 +87,7 @@ func (h *Base) ShouldHandle(e Event) bool {
 	return false
 }
 
-// Process processes an event
-func (h *Base) Process(e Event) error {
+func Process(h Handler, e Event) error {
 	if !h.ShouldHandle(e) {
 		return nil
 	}

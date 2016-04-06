@@ -101,7 +101,7 @@ func (c *Client) Forward(e api.RTMEvent) {
 			log.WithFields(log.Fields{
 				"handler": h.String(),
 			}).Info("processing event")
-			err := h.Process(event)
+			err := handler.Process(h, event)
 			if err != nil {
 				log.WithFields(log.Fields{
 					"team_id": c.TeamID,
